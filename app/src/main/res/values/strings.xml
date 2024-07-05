@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Weather</string>
+    <string name="location_hint">Please enter the location.</string>
+    <string name="search_screen">Search screen</string>
+    <string name="weather_screen">Weather</string>
+    <string name="forecast_by_location_name">Submit location name</string>
+</resources>
