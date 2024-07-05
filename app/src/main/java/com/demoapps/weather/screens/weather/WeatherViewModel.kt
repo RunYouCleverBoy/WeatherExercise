@@ -2,9 +2,11 @@ package com.demoapps.weather.screens.weather
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.demoapps.weather.R
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
 import com.demoapps.weather.repositories.WeatherRepo
+import com.demoapps.weather.repositories.api.CallResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -33,11 +35,22 @@ class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
     private fun onLoadWeather(location: LocationModel) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, location = location) }
-            val error = weatherRepo.fetchWeatherFromServer(location)
-            if (error != null) {
-                _state.update { it.copy(isLoading = false, error = error.readableMessage) }
-            } else {
-                _state.update { it.copy(isLoading = false) }
+            val result = weatherRepo.fetchWeatherFromServer(location)
+            val errorWording = when (result) {
+                is CallResult.Failure.NotFound -> R.string.err_location_not_found
+                is CallResult.Failure.ServerError -> R.string.err_server_error
+                is CallResult.Failure.UnknownError -> R.string.err_unknown_error
+                is CallResult.Failure.BadRequest -> R.string.err_bad_request
+                else -> null
+            }
+
+            val backgroundArt = when(errorWording) {
+                null -> R.drawable.weather_background
+                else -> R.drawable.stormy_ukiyo_e
+            }
+
+            _state.update {
+                it.copy(isLoading = false, error = errorWording, backgroundArt = backgroundArt)
             }
         }
     }

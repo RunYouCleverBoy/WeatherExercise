@@ -1,21 +1,28 @@
 package com.demoapps.weather.screens.weather
 
+import androidx.annotation.DrawableRes
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
 
 data class WeatherScreenState(
     val isLoading: Boolean = false,
     val weatherData: WeatherDisplayModel? = null,
+    @DrawableRes val backgroundArt: Int = 0,
     val location: LocationModel? = null,
-    val error: String? = null,
+    val error: Int? = null,
     val temperatureUnits: WeatherFormatters.TemperatureUnits = WeatherFormatters.TemperatureUnits.Celsius
 ) {
     data class WeatherDisplayModel(
         val location: String = "",
-        val temperature: String = "",
+        val temperatureModel: TemperatureModel = TemperatureModel(),
         val weatherCondition: String = "",
         val weatherIcon: String = ""
-    )
+    ) {
+        data class TemperatureModel(
+            val temperature: String = "",
+            val feelsLike: String = ""
+        )
+    }
 }
 
 sealed class WeatherScreenEvent {
@@ -28,11 +35,10 @@ fun WeatherModel.toWeatherScreenState(location: LocationModel, formatters: Weath
     val feelsLikeStr = feelsLike?.let { formatters.formatTemperature(it) }
     return WeatherScreenState.WeatherDisplayModel(
         location = location.placeName,
-        temperature = if (feelsLikeStr != null) {
-            "$temperatureStr ($feelsLikeStr)"
-        } else {
-            temperatureStr ?: ""
-        },
+        temperatureModel = WeatherScreenState.WeatherDisplayModel.TemperatureModel(
+            temperature = temperatureStr ?: "",
+            feelsLike = feelsLikeStr ?: ""
+        ),
         weatherCondition = weatherDescription,
         weatherIcon = iconUri
     )

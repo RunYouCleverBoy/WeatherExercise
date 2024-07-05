@@ -14,7 +14,7 @@ import org.koin.dsl.module
 object AppModule {
     fun provideAppModule(): Module = module {
         single { GeolocationRepo(get()) }
-        single { WeatherRepo(get(), get()) }
+        single { WeatherRepo(get()) }
         single { KtorEngine() }
         single {
             val secrets = get<Secrets>()

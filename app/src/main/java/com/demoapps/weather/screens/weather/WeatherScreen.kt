@@ -12,14 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.demoapps.weather.R
 import com.demoapps.weather.models.LocationModel
+import com.demoapps.weather.screens.weather.components.LabeledText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -49,33 +49,29 @@ fun WeatherScreen(locationModel: LocationModel) {
 private fun WeatherScreenUi(state: WeatherScreenState) {
     val weatherData = state.weatherData
     Box {
-        val painterResource by remember(weatherData) {
-            derivedStateOf {
-                when {
-                    weatherData != null -> R.drawable.weather_background
-                    else -> R.drawable.stormy_ukiyo_e
-                }
-            }
+        if (state.backgroundArt > 0) {
+            Image(
+                modifier = Modifier.fillMaxSize(),
+                alpha = 0.5f,
+                contentScale = ContentScale.Crop,
+                painter = painterResource(id = state.backgroundArt),
+                contentDescription = stringResource(id = R.string.weather_screen)
+            )
         }
-
-        Image(
-            modifier = Modifier.fillMaxSize(),
-            alpha = 0.5f,
-            contentScale = ContentScale.Crop,
-            painter = painterResource(id = painterResource),
-            contentDescription = stringResource(id = R.string.weather_screen)
-        )
+        if (state.isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
         Column(modifier = Modifier.fillMaxSize()) {
             weatherData?.location?.let { LocationRow(it) }
             weatherData?.let {
-                WeatherIconAndTempRow(weatherData.weatherIcon, weatherData.temperature)
+                WeatherIconAndTempRow(weatherData.weatherIcon, weatherData.temperatureModel)
             }
             weatherData?.weatherCondition?.let {
                 WeatherConditionRow(weatherData.weatherCondition)
             }
             Spacer(modifier = Modifier.weight(1f))
             state.error?.let {
-                ErrorRow(it)
+                ErrorRow(stringResource(id = it))
             }
         }
     }
@@ -95,7 +91,7 @@ private fun LocationRow(location: String) {
 }
 
 @Composable
-private fun WeatherIconAndTempRow(weatherIcon: String, temperature: String) {
+private fun WeatherIconAndTempRow(weatherIcon: String, temperature: WeatherScreenState.WeatherDisplayModel.TemperatureModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,8 +100,9 @@ private fun WeatherIconAndTempRow(weatherIcon: String, temperature: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        AsyncImage(modifier = Modifier.aspectRatio(1.0f), model = weatherIcon, contentDescription = temperature)
-        Text(text = temperature, style = MaterialTheme.typography.headlineLarge)
+        AsyncImage(modifier = Modifier.aspectRatio(1.0f), model = weatherIcon, contentDescription = stringResource(id = R.string.weather_icon))
+        LabeledText(label = stringResource(id = R.string.temperature), text = temperature.temperature)
+        LabeledText(label = stringResource(id = R.string.feels_like), text = temperature.feelsLike)
     }
 }
 
@@ -118,7 +115,7 @@ private fun WeatherConditionRow(weatherCondition: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Text(text = weatherCondition, style = MaterialTheme.typography.bodyLarge)
+        Text(text = weatherCondition, style = MaterialTheme.typography.displaySmall.copy(textAlign = TextAlign.Center))
     }
 }
 
@@ -143,11 +140,16 @@ fun WeatherScreenPreview() {
         state = WeatherScreenState(
             weatherData = WeatherScreenState.WeatherDisplayModel(
                 location = "New York",
-                temperature = "25°C",
-                weatherCondition = "Sunny",
+                temperatureModel = WeatherScreenState.WeatherDisplayModel.TemperatureModel(
+                    temperature = "25°C",
+                    feelsLike = "26°C"
+                ),
+                weatherCondition = "loreum ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
                 weatherIcon = "https://openweathermap.org/img/wn/10d@x.png"
             ),
-            error = "Error loading weather data"
+            backgroundArt = R.drawable.weather_background,
+            isLoading = true,
+            error = R.string.err_unknown_error
         )
     )
 }

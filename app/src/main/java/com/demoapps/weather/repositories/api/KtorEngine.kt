@@ -6,6 +6,7 @@ import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.isSuccess
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
@@ -17,13 +18,23 @@ class KtorEngine {
         isLenient = true
     }
 
-    suspend fun <T> get(uri: Uri, deserializerStrategy: DeserializationStrategy<T>): Result<T> {
-        val response = client.get(uri.toString())
+    suspend fun <T> get(uri: Uri, deserializerStrategy: DeserializationStrategy<T>): CallResult {
+        val response = try {
+            client.get(uri.toString())
+        } catch (e: Exception) {
+            return CallResult.Failure.UnknownError(e)
+        }
+
         return if (response.status.isSuccess()) {
             val text = response.bodyAsText()
-            Result.success(json.decodeFromString(deserializerStrategy, text))
+            CallResult.Success(json.decodeFromString(deserializerStrategy, text))
         } else {
-            Result.failure(Exception("Failed to fetch data ${response.status}"))
+            when (response.status) {
+                HttpStatusCode.BadRequest -> CallResult.Failure.BadRequest(Exception("Bad request"))
+                HttpStatusCode.NotFound -> CallResult.Failure.NotFound(Exception("Not found"))
+                HttpStatusCode.InternalServerError -> CallResult.Failure.ServerError(Exception("Internal server error"))
+                else -> CallResult.Failure.UnknownError(Exception("Unknown error"))
+            }
         }
     }
 
