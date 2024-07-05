@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.demoapps.weather.R
@@ -60,29 +62,13 @@ private fun PlaceSearchUi(
             contentScale = ContentScale.Crop,
             alpha = 0.5f,
             painter = painterResource(id = R.drawable.select_location_image),
-            contentDescription = stringResource(id = R.string.search_screen)
+            contentDescription = stringResource(id = R.string.search_screen_content_desc)
         )
         Column(modifier = Modifier.fillMaxSize()) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(80.dp)
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    singleLine = true,
-                    shape = RoundedCornerShape(40.dp),
-
-                    value = state.searchQuery,
-                    placeholder = { Text(text = stringResource(id = R.string.location_hint)) },
-                    onValueChange = { text -> onSearchEvent(PlaceSearchEvent.OnTextChanged(text)) })
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                IconButton(enabled = state.searchQuery.isNotBlank(), onClick = { onSearchEvent(PlaceSearchEvent.OnPlaceSelected(state.searchQuery.placeToLocationModel())) }) {
-                    Icon(painter = painterResource(id = R.drawable.ic_send), contentDescription = stringResource(R.string.forecast_by_location_name))
-                }
-            }
-
+            Text(modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp), text = stringResource(id = R.string.place_search_title), style = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center))
+            SearchRow(state, onSearchEvent)
             if (state.isLoading) {
                 LinearProgressIndicator(
                     modifier = Modifier.fillMaxWidth()
@@ -96,6 +82,29 @@ private fun PlaceSearchUi(
                     onSearchEvent(PlaceSearchEvent.OnPlaceSelected(it))
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun SearchRow(state: PlaceSearchState, onSearchEvent: (PlaceSearchEvent) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        OutlinedTextField(
+            modifier = Modifier
+                .weight(1f)
+                .height(80.dp)
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            singleLine = true,
+            shape = RoundedCornerShape(40.dp),
+
+            value = state.searchQuery,
+            placeholder = { Text(text = stringResource(id = R.string.location_hint)) },
+            onValueChange = { text -> onSearchEvent(PlaceSearchEvent.OnTextChanged(text)) })
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        IconButton(enabled = state.searchQuery.isNotBlank(), onClick = { onSearchEvent(PlaceSearchEvent.OnPlaceSelected(state.searchQuery.placeToLocationModel())) }) {
+            Icon(painter = painterResource(id = R.drawable.ic_send), contentDescription = stringResource(R.string.submit_name_button_content_desc))
         }
     }
 }

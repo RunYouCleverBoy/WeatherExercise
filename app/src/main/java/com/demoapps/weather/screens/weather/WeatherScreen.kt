@@ -56,7 +56,7 @@ private fun WeatherScreenUi(state: WeatherScreenState, onEvent: (WeatherScreenEv
                 alpha = 0.5f,
                 contentScale = ContentScale.Crop,
                 painter = painterResource(id = state.backgroundArt),
-                contentDescription = stringResource(id = R.string.weather_screen)
+                contentDescription = stringResource(id = R.string.weather_screen_content_desc)
             )
         }
         if (state.isLoading) {

@@ -1,16 +1,18 @@
 <resources>
     <string name="app_name">Weather</string>
-    <string name="location_hint">Please enter the location.</string>
-    <string name="search_screen">Search screen</string>
-    <string name="weather_screen">Weather</string>
-    <string name="forecast_by_location_name">Submit location name</string>
+    <string name="err_bad_request">App malfunction. Please contact support</string>
     <string name="err_location_not_found">Location not found</string>
     <string name="err_server_error">Server error</string>
     <string name="err_unknown_error">Unknown error. Please check your network connections</string>
-    <string name="err_bad_request">App malfunction. Please contact support</string>
-    <string name="weather_icon">Weather icon</string>
-    <string name="temperature">Temperature</string>
     <string name="feels_like">Feels like</string>
-    <string name="refresh_weather">Refresh</string>
-    <string name="change_location">Edit location</string>
+    <string name="location_hint">Please enter the location.</string>
+    <string name="place_search_title">Forecast Location</string>
+    <string name="temperature">Temperature</string>
+
+    <string name="change_location_content_desc">Edit location</string>
+    <string name="refresh_weather_content_desc">Refresh</string>
+    <string name="search_screen_content_desc">Search screen</string>
+    <string name="submit_name_button_content_desc">Submit location name</string>
+    <string name="weather_icon_content_desc">Weather icon</string>
+    <string name="weather_screen_content_desc">Weather</string>
 </resources>

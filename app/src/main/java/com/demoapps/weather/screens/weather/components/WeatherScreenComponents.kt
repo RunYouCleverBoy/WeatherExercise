@@ -50,7 +50,7 @@ fun WeatherIconAndTempRow(weatherIcon: String, temperature: WeatherScreenState.W
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        AsyncImage(modifier = Modifier.aspectRatio(1.0f), model = weatherIcon, contentDescription = stringResource(id = R.string.weather_icon))
+        AsyncImage(modifier = Modifier.aspectRatio(1.0f), model = weatherIcon, contentDescription = stringResource(id = R.string.weather_icon_content_desc))
         LabeledText(label = stringResource(id = R.string.temperature), text = temperature.temperature)
         LabeledText(label = stringResource(id = R.string.feels_like), text = temperature.feelsLike)
     }
@@ -65,10 +65,10 @@ fun WeatherConditionRow(modifier: Modifier, weatherCondition: String) {
 fun Controls(modifier: Modifier = Modifier, isEnabled: Boolean, onEvent: (WeatherScreenEvent) -> Unit) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         IconButton(enabled = isEnabled, onClick = { onEvent(WeatherScreenEvent.OnReloadClicked) }) {
-            Icon(painter = painterResource(id = R.drawable.ic_reload), contentDescription = stringResource(id = R.string.refresh_weather))
+            Icon(painter = painterResource(id = R.drawable.ic_reload), contentDescription = stringResource(id = R.string.refresh_weather_content_desc))
         }
         IconButton(enabled = isEnabled, onClick = { onEvent(WeatherScreenEvent.OnEditLocationClicked) }) {
-            Icon(painter = painterResource(id = R.drawable.ic_edit_location), contentDescription = stringResource(id = R.string.change_location))
+            Icon(painter = painterResource(id = R.drawable.ic_edit_location), contentDescription = stringResource(id = R.string.change_location_content_desc))
         }
     }
 }
