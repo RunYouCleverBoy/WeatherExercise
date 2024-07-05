@@ -11,4 +11,6 @@
     <string name="weather_icon">Weather icon</string>
     <string name="temperature">Temperature</string>
     <string name="feels_like">Feels like</string>
+    <string name="refresh_weather">Refresh</string>
+    <string name="change_location">Edit location</string>
 </resources>

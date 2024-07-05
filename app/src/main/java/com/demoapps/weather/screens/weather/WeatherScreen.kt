@@ -3,8 +3,11 @@ package com.demoapps.weather.screens.weather
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,8 +19,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.demoapps.weather.R
 import com.demoapps.weather.models.LocationModel
+import com.demoapps.weather.screens.MainDestinations
+import com.demoapps.weather.screens.weather.components.Controls
 import com.demoapps.weather.screens.weather.components.ErrorRow
 import com.demoapps.weather.screens.weather.components.LocationRow
 import com.demoapps.weather.screens.weather.components.WeatherConditionRow
@@ -25,18 +31,23 @@ import com.demoapps.weather.screens.weather.components.WeatherIconAndTempRow
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun WeatherScreen(locationModel: LocationModel) {
+fun WeatherScreen(locationModel: LocationModel, onNavigate: (MainDestinations) -> Unit = {}) {
     val weatherViewModel = koinViewModel<WeatherViewModel>()
     val state by weatherViewModel.state.collectAsState()
     LaunchedEffect(key1 = Unit) {
         weatherViewModel.dispatchEvent(WeatherScreenEvent.OnScreenLoad(locationModel))
+        weatherViewModel.effect.collect {
+            when (it) {
+                is WeatherScreenEffect.NavigateTo -> onNavigate(it.destination)
+            }
+        }
     }
 
-    WeatherScreenUi(state)
+    WeatherScreenUi(state, weatherViewModel::dispatchEvent)
 }
 
 @Composable
-private fun WeatherScreenUi(state: WeatherScreenState) {
+private fun WeatherScreenUi(state: WeatherScreenState, onEvent: (WeatherScreenEvent) -> Unit = {}) {
     val weatherData = state.weatherData
     Box {
         if (state.backgroundArt > 0) {
@@ -54,11 +65,23 @@ private fun WeatherScreenUi(state: WeatherScreenState) {
         Column(modifier = Modifier.fillMaxSize()) {
             weatherData?.location?.let { LocationRow(it) }
             weatherData?.let {
-                WeatherIconAndTempRow(weatherData.weatherIcon, weatherData.temperatureModel)
+                WeatherIconAndTempRow(weatherData.weatherIcon, weatherData.temperatureModel) {
+                    onEvent(WeatherScreenEvent.OnTemperatureClicked)
+                }
             }
-            weatherData?.weatherCondition?.let {
-                WeatherConditionRow(weatherData.weatherCondition)
+            Row {
+                weatherData?.weatherCondition?.let {
+                    WeatherConditionRow(
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        weatherData.weatherCondition
+                    )
+                } ?: Spacer(modifier = Modifier.weight(1f))
+                Controls(isEnabled = !state.isLoading, onEvent = onEvent)
             }
+
             Spacer(modifier = Modifier.weight(1f))
             state.error?.let {
                 ErrorRow(stringResource(id = it))

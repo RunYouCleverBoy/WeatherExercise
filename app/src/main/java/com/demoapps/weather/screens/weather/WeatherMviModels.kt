@@ -3,6 +3,7 @@ package com.demoapps.weather.screens.weather
 import androidx.annotation.DrawableRes
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
+import com.demoapps.weather.screens.MainDestinations
 
 data class WeatherScreenState(
     val isLoading: Boolean = false,
@@ -28,6 +29,12 @@ data class WeatherScreenState(
 sealed class WeatherScreenEvent {
     data class OnScreenLoad(val location: LocationModel) : WeatherScreenEvent()
     data object OnTemperatureClicked : WeatherScreenEvent()
+    data object OnEditLocationClicked : WeatherScreenEvent()
+    data object OnReloadClicked : WeatherScreenEvent()
+}
+
+sealed class WeatherScreenEffect {
+    data class NavigateTo(val destination: MainDestinations) : WeatherScreenEffect()
 }
 
 fun WeatherModel.toWeatherScreenState(location: LocationModel, formatters: WeatherFormatters): WeatherScreenState.WeatherDisplayModel {
@@ -43,6 +50,7 @@ fun WeatherModel.toWeatherScreenState(location: LocationModel, formatters: Weath
         weatherIcon = iconUri
     )
 }
+
 
 
 

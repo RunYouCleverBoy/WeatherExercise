@@ -7,7 +7,10 @@ import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
 import com.demoapps.weather.repositories.WeatherRepo
 import com.demoapps.weather.repositories.api.CallResult
+import com.demoapps.weather.screens.MainDestinations
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
@@ -16,6 +19,9 @@ import kotlinx.coroutines.launch
 class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
     private val _state = MutableStateFlow(WeatherScreenState())
     val state = _state.asStateFlow()
+
+    private val _effect = MutableSharedFlow<WeatherScreenEffect>()
+    val effect = _effect.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -29,6 +35,8 @@ class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
         when (event) {
             is WeatherScreenEvent.OnScreenLoad -> onLoadWeather(event.location)
             WeatherScreenEvent.OnTemperatureClicked -> onTemperatureClicked()
+            WeatherScreenEvent.OnEditLocationClicked -> emit(WeatherScreenEffect.NavigateTo(MainDestinations.PlaceSearch))
+            WeatherScreenEvent.OnReloadClicked -> state.value.location?.let { onLoadWeather(it) }
         }
     }
 
@@ -44,7 +52,7 @@ class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
                 else -> null
             }
 
-            val backgroundArt = when(errorWording) {
+            val backgroundArt = when (errorWording) {
                 null -> R.drawable.weather_background
                 else -> R.drawable.stormy_ukiyo_e
             }
@@ -52,6 +60,12 @@ class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
             _state.update {
                 it.copy(isLoading = false, error = errorWording, backgroundArt = backgroundArt)
             }
+        }
+    }
+
+    private fun emit(effect: WeatherScreenEffect) {
+        viewModelScope.launch {
+            _effect.emit(effect)
         }
     }
 

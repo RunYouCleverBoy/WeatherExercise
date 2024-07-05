@@ -1,8 +1,5 @@
 package com.demoapps.weather.screens
 
-import android.os.Build
-import android.os.Bundle
-import android.os.Parcelable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,7 +30,13 @@ fun MainScreen(modifier: Modifier = Modifier) {
             }
             composable(MainDestinations.Weather.route) {
                 location?.let {
-                    WeatherScreen(locationModel = it)
+                    WeatherScreen(locationModel = it) {
+                        navController.navigate(route = it.route) {
+                            popUpTo(MainDestinations.PlaceSearch.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
                 } ?: run {
                     navController.navigate(route = MainDestinations.PlaceSearch.route)
                 }
@@ -42,11 +45,3 @@ fun MainScreen(modifier: Modifier = Modifier) {
     }
 }
 
-inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String, clazz: Class<T>): T? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        getParcelable(key, clazz)
-    } else {
-        @Suppress("DEPRECATION")
-        getParcelable(key)
-    }
-}
