@@ -2,7 +2,6 @@ package com.demoapps.weather.screens.weather
 
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
-import com.demoapps.weather.utils.formatAccuracy
 
 data class WeatherScreenState(
     val isLoading: Boolean = false,

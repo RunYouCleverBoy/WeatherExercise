@@ -127,7 +127,8 @@ private fun ErrorRow(error: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp).background(Color.White.copy(alpha = 0.5f)),
+            .padding(16.dp)
+            .background(Color.White.copy(alpha = 0.5f)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {

@@ -4,7 +4,6 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
-import android.util.Log
 import com.demoapps.weather.models.LocationModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -12,7 +11,6 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.time.Duration.Companion.seconds
 
 class GeolocationRepo(context: Context) {
@@ -33,7 +31,7 @@ class GeolocationRepo(context: Context) {
             LocationModel(
                 latitude = address.latitude,
                 longitude = address.longitude,
-                placeName = (0.. address.maxAddressLineIndex).joinToString(", ") { address.getAddressLine(it) }
+                placeName = (0..address.maxAddressLineIndex).joinToString(", ") { address.getAddressLine(it) }
             )
         } ?: emptyList()
     }
