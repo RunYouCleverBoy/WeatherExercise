@@ -22,14 +22,14 @@ The error will disappear when refreshed and the error is resolved.
 
 Note that a different background will appear in case of an error.
 
-### Controls:
-## Refresh button
+### Controls
+#### Refresh button
 Clicking the refresh button will refresh the weather data for the current place.
 
-## Edit location button
+#### Edit location button
 Clicking the edit location button will take you back to the Place Search screen.
 
-## Fahrenheit/Celsius selection
+#### Fahrenheit/Celsius selection
 Clicking the temperature line will toggle between Fahrenheit and Celsius.
 
 # Libraries used
