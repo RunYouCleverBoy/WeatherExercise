@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
     private val _state = MutableStateFlow(WeatherScreenState())
@@ -52,9 +53,13 @@ class WeatherViewModel(private val weatherRepo: WeatherRepo) : ViewModel() {
                 else -> null
             }
 
+            (result as? CallResult.Failure)?.let {
+                Timber.w(it.exception, "Failed to fetch weather data. Showing $result")
+            }
+
             val backgroundArt = when (errorWording) {
                 null -> R.drawable.weather_background
-                else -> R.drawable.stormy_ukiyo_e
+                else -> R.drawable.faulty_weather_background
             }
 
             _state.update {

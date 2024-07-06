@@ -11,14 +11,14 @@ import io.ktor.http.isSuccess
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.Json
 
-class KtorEngine {
+class KtorNetworkingEngine : NetworkingEngine {
     private val client: HttpClient = createKtorClient()
     private val json = Json {
         ignoreUnknownKeys = true
         isLenient = true
     }
 
-    suspend fun <T> get(uri: Uri, deserializerStrategy: DeserializationStrategy<T>): CallResult {
+    override suspend fun <T> get(uri: Uri, deserializerStrategy: DeserializationStrategy<T>): CallResult {
         val response = try {
             client.get(uri.toString())
         } catch (e: Exception) {
