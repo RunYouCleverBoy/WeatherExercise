@@ -65,9 +65,11 @@ private fun PlaceSearchUi(
             contentDescription = stringResource(id = R.string.search_screen_content_desc)
         )
         Column(modifier = Modifier.fillMaxSize()) {
-            Text(modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp), text = stringResource(id = R.string.place_search_title), style = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center))
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp), text = stringResource(id = R.string.place_search_title), style = MaterialTheme.typography.headlineMedium.copy(textAlign = TextAlign.Center)
+            )
             SearchRow(state, onSearchEvent)
             if (state.isLoading) {
                 LinearProgressIndicator(

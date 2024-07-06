@@ -29,9 +29,9 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 }
             }
             composable(MainDestinations.Weather.route) {
-                location?.let {
-                    WeatherScreen(locationModel = it) {
-                        navController.navigate(route = it.route) {
+                location?.let { locationModel ->
+                    WeatherScreen(locationModel = locationModel) { destination ->
+                        navController.navigate(route = destination.route) {
                             popUpTo(MainDestinations.PlaceSearch.route) {
                                 inclusive = true
                             }

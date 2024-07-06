@@ -18,9 +18,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             WeatherTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding))
+                    MainScreen(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding)
+                    )
                 }
             }
         }
