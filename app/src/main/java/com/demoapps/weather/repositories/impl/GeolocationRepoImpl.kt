@@ -1,10 +1,11 @@
-package com.demoapps.weather.repositories
+package com.demoapps.weather.repositories.impl
 
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import android.os.Build
 import com.demoapps.weather.models.LocationModel
+import com.demoapps.weather.repositories.GeolocationRepo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext

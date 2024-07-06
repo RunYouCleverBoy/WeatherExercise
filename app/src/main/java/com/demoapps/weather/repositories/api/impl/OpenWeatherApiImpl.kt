@@ -1,12 +1,15 @@
-package com.demoapps.weather.repositories.api
+package com.demoapps.weather.repositories.api.impl
 
 import android.net.Uri
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
 import com.demoapps.weather.models.isCoordinateValid
+import com.demoapps.weather.repositories.api.CallResult
+import com.demoapps.weather.repositories.api.NetworkingEngine
+import com.demoapps.weather.repositories.api.WeatherApi
 import com.demoapps.weather.repositories.api.responses.WeatherApiResponse
 
-class WeatherApiImpl(private val networkingEngine: NetworkingEngine, private val apiKey: String) : WeatherApi {
+class OpenWeatherApiImpl(private val networkingEngine: NetworkingEngine, private val apiKey: String) : WeatherApi {
     // Weather API
     override suspend fun getWeather(locationModel: LocationModel): CallResult {
         // Get weather. Note that OneCall requires paid subscription (at least with credit card)

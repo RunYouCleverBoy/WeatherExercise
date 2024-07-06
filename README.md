@@ -1,4 +1,3 @@
-This document is best viewed with a markdown viewer, and a plantuml plugin (such as markdown plantuml).
 
 # Weather app
 
@@ -84,23 +83,13 @@ MVI defines 3 pipes of communication between ViewModel and View:
 #### Screen architecture
 
 ```plaintext
-PlaceSearchScreen -> PlaceSearchViewModel -> GeolocationRepo -> GoogleGeocodingAPI
-```
-
-The following sequence diagram (PlantUML) shows the flow of data in the Place Search screen:
-```plantuml
-PlaceSearchScreen -> PlaceSearchViewModel : Event: Search text changed
-PlaceSearchViewModel -> GeolocationRepo : Injected with Koin
-GeolocationRepo -> GoogleGeocodingAPI : Search for place
-activate GoogleGeocodingAPI
-GeolocationRepo <-- GoogleGeocodingAPI : Results
-deactivate GoogleGeocodingAPI
-PlaceSearchViewModel <-- GeolocationRepo : Results over Flow
-PlaceSearchScreen <- PlaceSearchViewModel : State: Display search results
-...
-PlaceSearchScreen -> PlaceSearchViewModel : Event: Suggestion clicked
-PlaceSearchViewModel -> PlaceSearchViewModel : Compose location record
-PlaceSearchScreen <- PlaceSearchViewModel : Effect: Navigate to (Weather screen)
+PlaceSearchScreen
+       | 
+PlaceSearchViewModel
+       |
+GeolocationRepo
+       |
+GoogleGeocodingAPI           
 ```
 
 The screen is based on a chain of responsibility.
@@ -124,24 +113,13 @@ When a place is available, the PlaceSearchViewModel will post an effect to navig
 
 ### Weather screen
 
-The following sequence diagram (PlantUML) shows the flow of data in the Weather screen:
-```plantuml
-WeatherScreen -> WeatherViewModel: Event: Location record
-WeatherViewModel -> WeatherRepo: Get weather
-WeatherRepo -> WeatherAPI: Fetch weather
-activate WeatherAPI
-WeatherAPI -> OpenWeatherMapAPI: Fetch weather
-WeatherAPI <-- OpenWeatherMapAPI: Weather JSON
-WeatherRepo <-- WeatherAPI: WeatherModel
-deactivate WeatherAPI
-WeatherViewModel <-- WeatherRepo: WeatherModel
-WeatherScreen <- WeatherViewModel: State: Display weather
-```
-
 The Weather screen receives the location record via the shared `rememberSavable` object.
 
-The screen signals the view model. The view model fetches the weather data from the OpenWeatherMap API.
-Note that the API key is stored in the manifest. The `SecretsRepo` is used to fetch the key.
+The screen signals the view model. The view model fetches the weather data from the WeatherRepo.
+WeatherRepo requests the data from the WeatherAPI - which, in turn, converts the response to a WeatherModel.
+
+The `WeatherModel` is posted to the `WeatherViewModel`, which prepares the state and posts it to the `WeatherScreen`.
+Note that the API key is stored in the manifest. The `Secrets` repo is used to fetch the key.
 
 WeatherAPI is injected to WeatherRepo, which is injected to WeatherViewModel.
 
@@ -155,44 +133,53 @@ As such, the project is divided into screens. Each has its unique View, ViewMode
 
 The repositories are shared between the screens (though, practically for this project they could have been separate).
 
-The following PlantUML diagram shows the project hierarchy:
-
-```plantuml
-skinparam packageStyle rect
-skinparam linetype ortho
-
-package DI {
-    [AppModule]
-}
-
-package screens {
-    [MainScreen]
-    rectangle Navigation {
-    }
-    [WeatherScreen]
-    [PlaceSearchScreen]
-}
-
-[MainScreen] --> [Navigation]
-[Navigation] --> [PlaceSearchScreen]
-[Navigation] --> [WeatherScreen]
-
-package repositories {
-    [GeolocationRepo]
-    [Secrets]
-    [WeatherRepo]
-    package API {
-        [WeatherAPI]
-        [NetworkingEngine]
-    }
-}
-
-[PlaceSearchScreen] --> [GeolocationRepo]
-[WeatherScreen] --> [WeatherRepo]
-[WeatherAPI] --> [NetworkingEngine]
-[WeatherRepo] --> [WeatherAPI]
-
-DI ---> [Secrets] : APIKey
-[Secrets] ..> [WeatherAPI] : APIKey
+The following diagram shows the project hierarchy:
+```plaintext
+├── MainActivity.kt
+├── WeatherApplication.kt
+├── di                         Dependency injection
+│   └── AppModule.kt
+├── models                     Data models
+│   ├── LocationModel.kt
+│   └── WeatherModel.kt
+├── repositories               Shared repositories
+│   ├── GeolocationRepo.kt
+│   ├── Secrets.kt
+│   ├── WeatherRepo.kt
+│   ├── api                     API (Network) interfaces
+│   │   ├── CallResult.kt
+│   │   ├── NetworkingEngine.kt
+│   │   ├── WeatherApi.kt
+│   │   ├── impl                         - Implementations
+│   │   │   ├── KtorNetworkingEngine.kt  - KTOR engine as a NetworkingEngine
+│   │   │   └── OpenWeatherApiImpl.kt    - OpenWeatherMap API implementation
+│   │   └── responses
+│   │       └── WeatherApiResponse.kt    - OpenWeatherMap API response
+│   └── impl                             - Implementations
+│       ├── GeolocationRepoImpl.kt
+│       ├── SecretsImpl.kt
+│       └── WeatherRepoImpl.kt
+├── screens
+│   ├── MainDestinations.kt
+│   ├── MainScreen.kt               - Main/Nav screen
+│   ├── placesearch
+│   │   ├── PlaceSearchScreen.kt
+│   │   ├── SearchMviModels.kt      - State, Effect, Event
+│   │   └── SearchViewModel.kt
+│   └── weather
+│       ├── WeatherFormatters.kt    - Formatters for the weather data
+│       ├── WeatherMviModels.kt     - State, Effect, Event
+│       ├── WeatherScreen.kt
+│       ├── WeatherViewModel.kt
+│       └── components
+│           ├── LabeledText.kt      - See temperature box
+│           └── WeatherScreenComponents.kt - Misc UI components
+├── ui
+│   └── theme
+│       ├── Color.kt
+│       ├── Theme.kt
+│       └── Type.kt
+└── utils
+    └── NumberUtils.kt
 
 ```

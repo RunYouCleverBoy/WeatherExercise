@@ -1,6 +1,8 @@
-package com.demoapps.weather.repositories.api
+package com.demoapps.weather.repositories.api.impl
 
 import android.net.Uri
+import com.demoapps.weather.repositories.api.CallResult
+import com.demoapps.weather.repositories.api.NetworkingEngine
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

@@ -1,7 +1,8 @@
-package com.demoapps.weather.repositories
+package com.demoapps.weather.repositories.impl
 
 import android.content.Context
 import android.content.pm.PackageManager
+import com.demoapps.weather.repositories.Secrets
 
 class SecretsImpl(context: Context) : Secrets {
     private val manifestMeta = context.packageManager.getApplicationInfo(context.packageName, PackageManager.GET_META_DATA).metaData

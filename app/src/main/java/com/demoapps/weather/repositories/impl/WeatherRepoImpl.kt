@@ -1,7 +1,8 @@
-package com.demoapps.weather.repositories
+package com.demoapps.weather.repositories.impl
 
 import com.demoapps.weather.models.LocationModel
 import com.demoapps.weather.models.WeatherModel
+import com.demoapps.weather.repositories.WeatherRepo
 import com.demoapps.weather.repositories.api.CallResult
 import com.demoapps.weather.repositories.api.WeatherApi
 import kotlinx.coroutines.flow.MutableStateFlow
