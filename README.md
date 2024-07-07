@@ -1,4 +1,3 @@
-
 # Weather app
 
 This is a simple weather app that uses the OpenWeatherMap API to get the weather data for a given place.
@@ -73,9 +72,13 @@ ViewModel - View coupling is implemented using MVI (Model-View-Intent) pattern.
 
 MVI defines 3 pipes of communication between ViewModel and View:
 
-1. State - Represents the screen with data. Prepared by the ViewModel and consumed by the View via StateFlow. Typically, ViewModels would prepare States as close as possible to what the View requires,
-   to avoid complex logic.
-2. Effect/Action - Represents a one-time event that the View should act upon. Prepared by the ViewModel and consumed by the View via SharedFlow.
+1. State - Represents the screen with data.
+   Prepared by the ViewModel and consumed by the View via StateFlow.
+   Typically, ViewModels would prepare States as close as possible to what the View requires,
+   to avoid complex logic in the view.
+   That is essential especially in _Jetpack Compose_, where recompositions are expensive.
+2. Effect/Action - Represents a one-time event that the View should act upon.
+   Prepared by the ViewModel and consumed by the View via SharedFlow.
 3. Event - Reposted by the view to the viewModel. E.g. Button pressed.
 
 ### Place search screen
@@ -93,7 +96,8 @@ GoogleGeocodingAPI
 ```
 
 The screen is based on a chain of responsibility.
-The View posts events to the ViewModel, which issues requests to the GeolocationRepo, which in turn issues requests to the GoogleGeocodingAPI.
+The View posts events to the ViewModel, which issues requests to the GeolocationRepo,
+which in turn issues requests to the GoogleGeocodingAPI.
 
 Responses return in the reverse order.
 
@@ -115,11 +119,21 @@ When a place is available, the PlaceSearchViewModel will post an effect to navig
 
 The Weather screen receives the location record via the shared `rememberSavable` object.
 
-The screen signals the view model. The view model fetches the weather data from the WeatherRepo.
-WeatherRepo requests the data from the WeatherAPI - which, in turn, converts the response to a WeatherModel.
+The `WeatherScreen` signals the `WeatherViewModel`. The view model fetches the weather data from the `WeatherRepo`.
+WeatherViewModel subscribes to the `WeatherRepo` for the weather data.
+The function `WeatherRepo.getWeather`:
+
+1. It is `suspend` function - so it "returns" an error upon failure.
+2. Updates the state flow with the weather data, such that the ViewModel can subscribe and update upon success,
+   and will always have a last successful readout, if any.
+
+WeatherRepo requests the data from the `WeatherAPI` - which, in turn, issues an HTTP GET request via KTOR. Since KTOR functions are `suspend`,
+it does not block the UI thread. Eventually, `WeatherAPI` converts the response to a WeatherModel.
+
+Note that the API key is stored in the manifest. The `Secrets` repo is used to fetch the key.
+A more secure way could be to use the `local.properties` file, but for the sake of simplicity, the key is stored in the manifest.
 
 The `WeatherModel` is posted to the `WeatherViewModel`, which prepares the state and posts it to the `WeatherScreen`.
-Note that the API key is stored in the manifest. The `Secrets` repo is used to fetch the key.
 
 WeatherAPI is injected to WeatherRepo, which is injected to WeatherViewModel.
 
@@ -134,6 +148,7 @@ As such, the project is divided into screens. Each has its unique View, ViewMode
 The repositories are shared between the screens (though, practically for this project they could have been separate).
 
 The following diagram shows the project hierarchy:
+
 ```plaintext
 ├── MainActivity.kt
 ├── WeatherApplication.kt
